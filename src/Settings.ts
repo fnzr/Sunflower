@@ -1,6 +1,6 @@
 class Settings {
-    static readonly WORLD_WIDTH = 720;
-    static readonly WORLD_HEIGHT = 740;
+    static readonly WORLD_WIDTH = 500;
+    static readonly WORLD_HEIGHT = 800;
 
     static DEBUG_HITBOX = true;
 }

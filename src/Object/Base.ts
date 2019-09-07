@@ -24,15 +24,6 @@ abstract class CoordinateTransformer {
     get y(): number {
         return this._y;
     }
-
-    set z(value: number) {
-        this._z = value;
-        this.sprite.zIndex = -this.z; //Math goes here
-    }
-
-    get z(): number {
-        return this._z;
-    }
 }
 
 export abstract class WorldObject extends CoordinateTransformer {
@@ -40,11 +31,16 @@ export abstract class WorldObject extends CoordinateTransformer {
     destroyed = false;
     speedX = 0;
     speedY = 0;
+    isEnemy = true;
+    radiusSquared = 0;
 
     constructor(sprite: PIXI.Sprite) {
         super();
         this.sprite = sprite;
+        this.sprite.anchor.set(0.5);
     }
+
+    abstract addToScreen(): void;
 
     abstract removeFromScreen(): void;
 

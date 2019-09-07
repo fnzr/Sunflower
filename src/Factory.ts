@@ -1,5 +1,6 @@
 import { WorldObject } from "@Object/Base";
 import { Bullet } from "@Object/Bullet";
+import Player from "@Object/Player/Player";
 
 export default class Factory {
 
@@ -7,8 +8,7 @@ export default class Factory {
     static poolsKeyChanged = false;
 
     static reset(clear = false) {
-        const pools = Object.values(this.Pools)
-        pools.forEach(pool => pool.forEach(obj => obj.removeFromScreen()));
+        this.Pools["Bullet"].forEach(obj => obj.removeFromScreen());
         if (clear) {
             this.Pools = {};
         }
@@ -20,6 +20,14 @@ export default class Factory {
             this.Pools[className] = [];
         }
         return this.Pools[className];
+    }
+
+    static buildPlayer() {
+        const pool = this.getPoolForClass(Player.name);
+        const player = new Player();
+        pool.push(player);
+        player.addToScreen();
+        return player;
     }
 
     static buildBullet() {

@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener('keydown', onKeyDown, false);
     document.addEventListener('keyup', onKeyUp, false);
     document.querySelector("#cv")!.appendChild(world.app.view);
-    world.app.start();
 });
 
 (window as any).World = world;

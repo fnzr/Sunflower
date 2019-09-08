@@ -28,11 +28,12 @@ abstract class CoordinateTransformer {
 
 export abstract class WorldObject extends CoordinateTransformer {
     sprite: PIXI.Sprite;
-    destroyed = false;
+    speed = 0;
     speedX = 0;
     speedY = 0;
     isEnemy = true;
     radiusSquared = 0;
+    angle = 0;
 
     constructor(sprite: PIXI.Sprite) {
         super();
@@ -40,9 +41,32 @@ export abstract class WorldObject extends CoordinateTransformer {
         this.sprite.anchor.set(0.5);
     }
 
-    abstract addToScreen(): void;
+    get visible() {
+        return this.sprite.visible;
+    }
 
-    abstract removeFromScreen(): void;
+    set visible(value: boolean) {
+        this.sprite.visible = value;
+    }
+
+    addToScreen() {
+        this.visible = true;
+    }
+
+    updateSpeed() {
+        this.speedX = Math.cos(this.angle) * this.speed;
+        this.speedY = Math.sin(this.angle) * this.speed;
+    }
+
+    removeFromScreen() {
+        this.visible = false;
+        this.sprite.tint = 0xFFFFFF;
+    }
+
+    move(delta: number) {
+        this.x += this.speedX * delta;
+        this.y += this.speedY * delta;
+    }
 
     abstract update(delta: number, elapsed: number): void;
 }

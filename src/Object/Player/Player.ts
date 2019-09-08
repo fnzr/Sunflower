@@ -48,11 +48,6 @@ export default class Player extends Unit {
         console.log("Hit!");
     }
 
-    move(delta: number) {
-        this.x += this.speedX * delta;
-        this.y += this.speedY * delta;
-    }
-
     update(delta: number, elapsed: number): void {
         this.controller.update();
         this.move(delta);

@@ -3,9 +3,11 @@ import Factory from './Factory';
 import Settings from '@Settings';
 import { installControls, Button } from '@Object/Player/Controller';
 import Player from '@Object/Player/Player';
+import EventManager, { GameEvent } from '@Event/EventManager';
+import Enemy, { Behavior } from '@Object/Enemy';
 
 function onGameLoaded(world: World) {
-    const player = Factory.buildPlayer();
+    const player = new Player();
     player.x = 250;
     player.y = 100;
     installControls({
@@ -15,17 +17,21 @@ function onGameLoaded(world: World) {
         [Button.DOWN]: "40",
         [Button.MOD]: "16"
     }, player);
-    world.players.push(player);
+    world.player = player;
+    world.unitContainer.addChild(player.sprite);
+    player.addToScreen();
+    world.app.start();
 }
 
 class World {
     app: PIXI.Application;
-    bulletContainer: PIXI.ParticleContainer;
+    bulletContainer: PIXI.Container;
     unitContainer: PIXI.Container;
     camera: PIXI.Container = new PIXI.Container();
     textures: { [k: string]: PIXI.Texture } = {};
     loader: PIXI.Loader;
-    players: Player[] = [];
+    player!: Player;
+    gameStep = 0;
 
     constructor() {
         this.app = new PIXI.Application({
@@ -36,7 +42,7 @@ class World {
         });
         const stage = new PIXI.Container();
         this.app.stage = stage;
-        this.bulletContainer = new PIXI.ParticleContainer();
+        this.bulletContainer = new PIXI.Container();
         stage.addChild(this.bulletContainer);
 
         this.unitContainer = new PIXI.Container();
@@ -48,20 +54,40 @@ class World {
         this.loader.load(() => {
             onGameLoaded(this);
         });
-        const gameStep = 90 / 1500;
+
+        let lag = 0;
         let pools = Object.values(Factory.Pools);
         this.app.ticker.maxFPS = 60;
         this.app.ticker.minFPS = 30;
-        let lag = 0;
+        // Time between physics update
+        // Low is more smooth and expensive.
+        const STEP_SIZE = 0.1;
+        const manager = new EventManager();
+        let x: Enemy;
+        manager.addEvent(200, new GameEvent(() => {
+            x = Factory.buildEnemy(250, 100, { speed: 1, angle: Math.PI / 2 })
+        }, 5, 600));
+        manager.addEvent(2000, new GameEvent(() => {
+            x.behavior = Behavior.create({ angle: 0.01 });
+        }, 5, 600));
         this.app.ticker.add(() => {
-            //lag += delta;
-            if (Factory.poolsKeyChanged) {
-                pools = Object.values(Factory.Pools)
+            //let count = 0;
+            lag += this.app.ticker.deltaTime;
+            while (lag >= STEP_SIZE) {
+                if (Factory.poolsKeyChanged) {
+                    pools = Object.values(Factory.Pools)
+                }
+                pools.forEach(pool => pool.forEach(worldObject => {
+                    if (worldObject.visible) worldObject.update(STEP_SIZE, this.app.ticker.elapsedMS)
+                }));
+                this.player.update(STEP_SIZE, this.app.ticker.elapsedMS);
+                lag -= STEP_SIZE;
+                //count++;
+                this.gameStep += 1;
+                manager.execute(this.gameStep);
             }
             document.getElementById("fps")!.innerHTML = Math.floor(this.app.ticker.FPS).toString();
-            pools.forEach(pool => pool.forEach(worldObject => {
-                if (!worldObject.destroyed) worldObject.update(this.app.ticker.deltaTime, this.app.ticker.elapsedMS)
-            }));
+            //console.log(count);
         })
     }
 }

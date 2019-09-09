@@ -4,7 +4,7 @@ import { sleep } from "@Utils";
 export class Spawner {
 
     static async spawn() {
-        const bullet = Factory.buildBullet({x:240, y:380, speed: 1, angle: 3 * Math.PI / 2});
+        const bullet = Factory.buildBullet({x:240, y:380, speed: {speed: 1, angle: 3 * Math.PI / 2}});
         //bullet.speed = 1.5;
         bullet.updateSpeed();
     }
@@ -23,7 +23,7 @@ export class Spawner {
                 const angle = initialAngle + (angleStep * i);
                 const x = 240 + radius * Math.cos(angle);
                 const y = 380 + radius * Math.sin(angle);
-                const bullet = Factory.buildBullet({x, y, speed: 1.5, angle: angle});
+                const bullet = Factory.buildBullet({x, y, speed: {speed: 1.5, angle: angle}});
                 bullet.updateSpeed();
                 bullet.sprite.tint = colors[i % 7];
                 await sleep(50);

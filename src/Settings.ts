@@ -9,5 +9,7 @@ class Settings {
     static readonly WALK_SPEED = 1;
 
     static DEBUG_HITBOX = true;
+
+    static readonly GAME_STEP_SIZE = 0.1;
 }
 export default Settings

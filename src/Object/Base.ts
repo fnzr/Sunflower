@@ -27,11 +27,20 @@ abstract class CoordinateTransformer {
     }
 }
 
+interface SpeedAngular {
+    speed: number
+    angle: number
+}
+
+interface SpeedScalar {
+    x: number
+    y: number
+}
+
 export interface Properties {
     x: number;
     y: number;
-    speed: number;
-    angle: number;
+    speed: SpeedAngular | SpeedScalar;
     radius?: number;
     texture?: PIXI.Texture;
 }
@@ -81,11 +90,17 @@ export abstract class WorldObject extends CoordinateTransformer {
     setProperties(props: Properties) {
         this.x = props.x;
         this.y = props.y;
-        this.speed = props.speed;
-        this.angle = props.angle;
+        if ("speed" in props.speed) {
+            this.speed = props.speed.speed;
+            this.angle = props.speed.angle;
+            this.updateSpeed();
+        }
+        else {
+            this.speedX = props.speed.x;
+            this.speedY = props.speed.y;
+        }
         this.sprite.texture = props.texture ? props.texture : World.loader.resources.rect.texture;
         this.radiusSquared = Math.pow(props.radius ? props.radius : 2, 2);
-        this.updateSpeed();
     }
 
     behavior() {}

@@ -1,12 +1,13 @@
 import World from "@World";
 import { Unit } from "./Unit";
 import Settings from '@Settings';
+import Factory from "@Factory";
 
 export default class Enemy extends Unit {
 
     attackCooldown = 20000;
-    lastAttack = 20000;
-    index = 0;
+    lastAttack = 0;
+
     constructor() {
         super()
     }
@@ -23,16 +24,21 @@ export default class Enemy extends Unit {
         World.liveEnemies.splice(index, 1);
     }
 
+    fireOnPlayer(speed: number) {
+        if (this.lastAttack >= this.attackCooldown) {
+            this.lastAttack = 0;
+            Factory.buildBullet({x: this.x, y: this.y, speed: {speed, angle: Math.atan2(World.player.y - this.y, World.player.x - this.x)}});
+        }
+    }
+
     update(delta: number, elapsed: number): void {
         if (!this.visible || this.x > Settings.ENEMY_LIMIT_X || this.x < -100
             || this.y > Settings.ENEMY_LIMIT_Y || this.y < 0) {
             this.removeFromScreen();
             return;
         }
-        //console.log(this.y)
         this.lastAttack += elapsed;
-        this.behavior();
-        this.updateSpeed();
+        this.behavior();        
         this.move(delta);
     }
 }

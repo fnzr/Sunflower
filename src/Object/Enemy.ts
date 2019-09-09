@@ -1,57 +1,37 @@
-import * as PIXI from 'pixi.js';
 import World from "@World";
 import { Unit } from "./Unit";
-
-export class Behavior {
-    speed: number;
-    angle: number;
-
-    static create({
-        speed = 0,
-        angle = 0
-    }) {
-        const behavior = new Behavior(speed, angle);
-        return behavior;
-    }
-
-    private constructor(speed: number, angle: number) {
-        this.speed = speed;
-        this.angle = angle
-    }
-}
+import Settings from '@Settings';
 
 export default class Enemy extends Unit {
 
-    _behavior: Behavior = Behavior.create({});
-
+    attackCooldown = 20000;
+    lastAttack = 20000;
+    index = 0;
     constructor() {
-        super(PIXI.Sprite.from(World.loader.resources.rect.texture))
+        super()
     }
 
     addToScreen() {
-        this.sprite.tint = 0xFF0000;
+        super.addToScreen();
+        this.sprite.tint = 0xFF0000;        
+        World.liveEnemies.push(this);
     }
 
-    setProperties({
-        speed = 0,
-        angle = 0
-    }) {
-        this.speed = speed;
-        this.angle = angle;
-        this.updateSpeed();
-    }
-
-    set behavior(value: Behavior) {
-        this._behavior = value;
-    }
-
-    get behavior() {
-        return this._behavior;
+    removeFromScreen() {
+        super.removeFromScreen();
+        const index = World.liveEnemies.indexOf(this);
+        World.liveEnemies.splice(index, 1);
     }
 
     update(delta: number, elapsed: number): void {
-        this.angle += (this.behavior.angle * delta);
-        this.speed += (this.behavior.speed * delta);
+        if (!this.visible || this.x > Settings.ENEMY_LIMIT_X || this.x < -100
+            || this.y > Settings.ENEMY_LIMIT_Y || this.y < 0) {
+            this.removeFromScreen();
+            return;
+        }
+        //console.log(this.y)
+        this.lastAttack += elapsed;
+        this.behavior();
         this.updateSpeed();
         this.move(delta);
     }

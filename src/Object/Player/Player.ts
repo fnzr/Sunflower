@@ -9,7 +9,7 @@ export default class Player extends Unit {
     controller: Controller;
 
     constructor(tint = 0x0) {
-        super(PIXI.Sprite.from(World.loader.resources.rect.texture));
+        super(World.loader.resources.rect.texture);
         this.radiusSquared = 16;
         this.isEnemy = false;
         this.sprite.tint = tint;

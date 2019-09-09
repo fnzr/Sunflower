@@ -4,12 +4,9 @@ import { sleep } from "@Utils";
 export class Spawner {
 
     static async spawn() {
-        const bullet = Factory.buildBullet();
+        const bullet = Factory.buildBullet({x:240, y:380, speed: 1, angle: 3 * Math.PI / 2});
         //bullet.speed = 1.5;
-        bullet.angle = 3 * Math.PI / 2;
         bullet.updateSpeed();
-        bullet.x = 240
-        bullet.y = 380
     }
 
     static async PsychdelicWave(initialAngle = 7 * Math.PI / 4, clockwise = true, clear = true) {
@@ -23,11 +20,10 @@ export class Spawner {
         for (let w = 0; w < waves; w++) {
             initialAngle = initialAngle + step;
             for (let i = 0; i < count; i++) {
-                const bullet = Factory.buildBullet();
-                bullet.speed = 1.5;
-                bullet.angle = initialAngle + (angleStep * i);
-                bullet.x = 240 + radius * Math.cos(bullet.angle);
-                bullet.y = 380 + radius * Math.sin(bullet.angle);
+                const angle = initialAngle + (angleStep * i);
+                const x = 240 + radius * Math.cos(angle);
+                const y = 380 + radius * Math.sin(angle);
+                const bullet = Factory.buildBullet({x, y, speed: 1.5, angle: angle});
                 bullet.updateSpeed();
                 bullet.sprite.tint = colors[i % 7];
                 await sleep(50);

@@ -1,13 +1,12 @@
-import * as PIXI from 'pixi.js'
 import World from "@World";
-import { WorldObject } from "./Base";
+import { WorldObject, Properties } from "./Base";
 import Settings from "@Settings";
 
 export class Bullet extends WorldObject {
     timeAlive = 0;
 
     constructor() {
-        super(PIXI.Sprite.from(World.loader.resources.circle.texture));
+        super();
         this.radiusSquared = 64;
     }
 
@@ -21,6 +20,11 @@ export class Bullet extends WorldObject {
         //}
     }
 
+    setProperties(props: Properties) {
+        props.texture = props.texture ? props.texture : World.loader.resources.circle.texture;
+        super.setProperties(props);        
+    }
+
     update(delta: number, elapsed: number): void {
         this.timeAlive += elapsed;
         if (!this.visible || this.x > Settings.WORLD_WIDTH || this.x < 0
@@ -28,8 +32,7 @@ export class Bullet extends WorldObject {
             this.removeFromScreen();
             return;
         }
-        //this.trigger(delta);
-        this.checkColision();
+        this.behavior();
         this.move(delta);
     }
 }

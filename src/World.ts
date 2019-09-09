@@ -4,7 +4,8 @@ import Settings from '@Settings';
 import { installControls, Button } from '@Object/Player/Controller';
 import Player from '@Object/Player/Player';
 import EventManager, { GameEvent } from '@Event/EventManager';
-import Enemy, { Behavior } from '@Object/Enemy';
+import Enemy from '@Object/Enemy';
+import { Bullet } from '@Object/Bullet';
 
 function onGameLoaded(world: World) {
     const player = new Player();
@@ -33,6 +34,7 @@ class World {
     player!: Player;
     gameStep = 0;
     manager: EventManager;
+    liveEnemies: Enemy[] = [];
 
     constructor() {
         this.app = new PIXI.Application({
@@ -65,24 +67,42 @@ class World {
         const STEP_SIZE = 0.1;
         this.manager = new EventManager();
         let x: Enemy;
+        const world = this;
         this.manager.addEvent(1000, new GameEvent(() => {
-            x = Factory.buildEnemy(250, 100, { speed: 1, angle: Math.PI / 2 })
-        }, 5, 1));
-        this.manager.addEvent(1001, new GameEvent(() => {
-            x.behavior = Behavior.create({ angle: 0.01 });
-        }, 5, 600));
+            x = Factory.buildEnemy({x: 100, y: 500, speed: -1, angle: Math.PI / 2 })
+            x.behavior = function(this: Enemy){
+                if (this.lastAttack >= this.attackCooldown) {
+                    this.lastAttack = 0;
+                    Factory.buildBullet({x: this.x, y: this.y, speed: 2, angle: Math.atan2(world.player.y - this.y, world.player.x - this.x)});
+                } 
+                /*
+                if (this.y >= 150) {
+                    this.speed = 3;
+                    this.updateSpeed();
+                    this.trigger = function(this: Enemy){ 
+                        if (this.y >= 300) {
+                            this.speed = -1;
+                            this.updateSpeed();
+                            this.behavior = Behavior.create({ angle: 0.01});
+                            this.trigger = () => {};
+                        }
+                    }
+                }
+                */
+            }
+        }, 5, 1285));
         let gameTime = 0;
         this.app.ticker.add(() => {
             gameTime += this.app.ticker.elapsedMS;
             this.manager.execute(gameTime);
             lag += this.app.ticker.deltaTime;
             while (lag >= STEP_SIZE) {
-                if (Factory.poolsKeyChanged) {
-                    pools = Object.values(Factory.Pools)
-                }
-                pools.forEach(pool => pool.forEach(worldObject => {
-                    if (worldObject.visible) worldObject.update(STEP_SIZE, this.app.ticker.elapsedMS)
-                }));
+                Factory.Pools[Bullet.name].forEach(bullet => {
+                    if (bullet.visible) bullet.update(STEP_SIZE, this.app.ticker.elapsedMS)
+                })
+                this.liveEnemies.forEach(enemy => {
+                    enemy.update(STEP_SIZE, this.app.ticker.elapsedMS);
+                })
                 this.player.update(STEP_SIZE, this.app.ticker.elapsedMS);
                 lag -= STEP_SIZE;
             }

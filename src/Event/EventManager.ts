@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export class GameEvent {
 
     repeat: number;
@@ -19,24 +21,39 @@ export class GameEvent {
 export default class EventManager {
 
     events: { [step: number]: GameEvent[] } = {};
+    timers: number[] = [];
+
+    private addTimer(time: number) {
+        const index = _.sortedIndexBy(this.timers, time, o => -o);
+        this.timers.splice(index, 0, time);
+    }
+
+    get nextTimer() {
+        return this.timers[this.timers.length - 1];
+    }
 
     addEvent(step: number, event: GameEvent) {
         if (!(step in this.events)) {
             this.events[step] = []
+            this.addTimer(step);
         }
         this.events[step].push(event);
     }
 
-    execute(step: number) {
-        if (step in this.events) {
-            this.events[step].forEach(event => {
+    execute(currentTime: number) {
+        while (currentTime >= this.nextTimer) {
+            const time = this.timers.pop();
+            if (time === undefined) {
+                return;
+            }
+            this.events[time].forEach(event => {
                 event.execute();
                 if (event.repeat > 0) {
                     event.repeat--;
-                    this.addEvent(step + event.repeatTime, event);
+                    this.addEvent(time + event.repeatTime, event);
                 }
             })
-            delete this.events[step];
+            delete this.events[time];
         }
     }
 }

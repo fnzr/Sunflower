@@ -32,6 +32,7 @@ class World {
     loader: PIXI.Loader;
     player!: Player;
     gameStep = 0;
+    manager: EventManager;
 
     constructor() {
         this.app = new PIXI.Application({
@@ -62,16 +63,18 @@ class World {
         // Time between physics update
         // Low is more smooth and expensive.
         const STEP_SIZE = 0.1;
-        const manager = new EventManager();
+        this.manager = new EventManager();
         let x: Enemy;
-        manager.addEvent(200, new GameEvent(() => {
+        this.manager.addEvent(1000, new GameEvent(() => {
             x = Factory.buildEnemy(250, 100, { speed: 1, angle: Math.PI / 2 })
-        }, 5, 600));
-        manager.addEvent(2000, new GameEvent(() => {
+        }, 5, 1));
+        this.manager.addEvent(1001, new GameEvent(() => {
             x.behavior = Behavior.create({ angle: 0.01 });
         }, 5, 600));
+        let gameTime = 0;
         this.app.ticker.add(() => {
-            //let count = 0;
+            gameTime += this.app.ticker.elapsedMS;
+            this.manager.execute(gameTime);
             lag += this.app.ticker.deltaTime;
             while (lag >= STEP_SIZE) {
                 if (Factory.poolsKeyChanged) {
@@ -82,12 +85,8 @@ class World {
                 }));
                 this.player.update(STEP_SIZE, this.app.ticker.elapsedMS);
                 lag -= STEP_SIZE;
-                //count++;
-                this.gameStep += 1;
-                manager.execute(this.gameStep);
             }
             document.getElementById("fps")!.innerHTML = Math.floor(this.app.ticker.FPS).toString();
-            //console.log(count);
         })
     }
 }

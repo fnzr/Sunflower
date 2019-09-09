@@ -8,11 +8,13 @@
     "serve": "webpack-dev-server"
   },
   "dependencies": {
+    "lodash": "^4.17.15",
     "pixi.js": "^5.1.2",
     "ts-node": "^8.3.0",
     "typescript": "^3.6.2"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.138",
     "@types/pixi.js": "^4.8.8",
     "@typescript-eslint/eslint-plugin": "^2.1.0",
     "@typescript-eslint/parser": "^2.1.0",

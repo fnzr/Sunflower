@@ -8,6 +8,8 @@
     "serve": "webpack-dev-server"
   },
   "dependencies": {
+    "@types/chance": "^1.0.6",
+    "chance": "^1.1.0",
     "lodash": "^4.17.15",
     "pixi.js": "^5.1.2",
     "ts-node": "^8.3.0",

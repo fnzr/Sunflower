@@ -53,6 +53,7 @@ export abstract class WorldObject extends CoordinateTransformer {
     isEnemy = true;
     radiusSquared = 0;
     angle = 0;
+    timeAlive = 0;
 
     constructor(texture?: PIXI.Texture) {
         super();
@@ -70,6 +71,7 @@ export abstract class WorldObject extends CoordinateTransformer {
 
     addToScreen() {
         this.visible = true;
+        this.timeAlive = 0;
     }
 
     updateSpeed() {
@@ -105,5 +107,9 @@ export abstract class WorldObject extends CoordinateTransformer {
 
     behavior() {}
 
-    abstract update(delta: number, elapsed: number): void;
+    update(delta: number, elapsed: number) {
+        this.timeAlive += elapsed;
+        this.behavior();
+        this.move(delta);
+    }
 }

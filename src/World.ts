@@ -42,8 +42,8 @@ class World {
 
     constructor() {
         this.app = new PIXI.Application({
-            height: Settings.WORLD_HEIGHT,
-            width: Settings.WORLD_WIDTH,
+            height: 600,
+            width: 800,
             backgroundColor: 0xdde2ed,
             autoStart: false
         });
@@ -84,6 +84,7 @@ class World {
                 })
                 this.player.update(Settings.GAME_STEP_SIZE, this.app.ticker.elapsedMS);
                 lag -= Settings.GAME_STEP_SIZE;
+                this.gameStep += 1;
             }
             document.getElementById("fps")!.innerHTML = Math.floor(this.app.ticker.FPS).toString();
         })

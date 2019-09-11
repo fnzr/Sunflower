@@ -2,6 +2,9 @@ import World from "@World";
 import { Unit } from "./Unit";
 import Settings from '@Settings';
 import Factory from "@Factory";
+import { Properties } from "./Base";
+
+export type EnemyProperties = Properties & {attackCooldown?: number}
 
 export default class Enemy extends Unit {
 
@@ -14,7 +17,7 @@ export default class Enemy extends Unit {
 
     addToScreen() {
         super.addToScreen();
-        this.sprite.tint = 0xFF0000;        
+        this.sprite.tint = 0xFF0000;
         World.liveEnemies.push(this);
     }
 
@@ -24,11 +27,33 @@ export default class Enemy extends Unit {
         World.liveEnemies.splice(index, 1);
     }
 
-    fireOnPlayer(speed: number) {
-        if (this.lastAttack >= this.attackCooldown) {
+    setProperties(props: EnemyProperties) {
+        this.attackCooldown = props.attackCooldown ? props.attackCooldown : 0;
+        super.setProperties(props);        
+    }
+
+    get canAttack() {
+        return this.lastAttack >= this.attackCooldown;
+    }
+
+    fireAtPlayer(speed: number) {
+        if (this.canAttack) {
             this.lastAttack = 0;
             Factory.buildBullet({x: this.x, y: this.y, speed: {speed, angle: Math.atan2(World.player.y - this.y, World.player.x - this.x)}});
         }
+    }
+
+    fireArc(shotCount: number, speed: number, angle = 0, spread = -Math.PI) {
+        if (!this.canAttack) {
+            return;
+        }
+        this.lastAttack = 0;
+        const angleStep = (spread - angle) / shotCount;
+        for(let i=0; i<shotCount; i++) {
+            const ang = angle + angleStep * i;
+            Factory.buildBullet({x: this.x, y: this.y, speed: {speed, angle: ang}})
+        }
+        
     }
 
     update(delta: number, elapsed: number): void {
@@ -37,8 +62,7 @@ export default class Enemy extends Unit {
             this.removeFromScreen();
             return;
         }
-        this.lastAttack += elapsed;
-        this.behavior();        
-        this.move(delta);
+        super.update(delta, elapsed);
+        this.lastAttack += elapsed;        
     }
 }

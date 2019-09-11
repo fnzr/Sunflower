@@ -3,7 +3,6 @@ import { WorldObject, Properties } from "./Base";
 import Settings from "@Settings";
 
 export class Bullet extends WorldObject {
-    timeAlive = 0;
 
     constructor() {
         super();
@@ -26,13 +25,11 @@ export class Bullet extends WorldObject {
     }
 
     update(delta: number, elapsed: number): void {
-        this.timeAlive += elapsed;
         if (!this.visible || this.x > Settings.WORLD_WIDTH || this.x < 0
             || this.y > Settings.WORLD_HEIGHT || this.y < 0) {
             this.removeFromScreen();
             return;
         }
-        this.behavior();
-        this.move(delta);
+        super.update(delta, elapsed);
     }
 }

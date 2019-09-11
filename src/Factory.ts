@@ -1,7 +1,7 @@
 import { WorldObject, Properties } from "@Object/Base";
 import { Bullet } from "@Object/Bullet";
 import World from "@World";
-import Enemy from "@Object/Enemy";
+import Enemy, { EnemyProperties } from "@Object/Enemy";
 
 export default class Factory {
 
@@ -20,7 +20,7 @@ export default class Factory {
         */
     }
 
-    static buildEnemy(props: Properties) {
+    static buildEnemy(props: EnemyProperties) {
         const pool = this.Pools[Enemy.name];
         let enemy = pool.find((e => !e.visible)) as Enemy;
         if (enemy === undefined) {

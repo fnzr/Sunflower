@@ -1,5 +1,5 @@
 class Settings {
-    static readonly WORLD_WIDTH = 640;
+    static readonly WORLD_WIDTH = 380;
     static readonly WORLD_HEIGHT = 480;
 
     static readonly ENEMY_LIMIT_X = Settings.WORLD_WIDTH + 100;
@@ -11,5 +11,7 @@ class Settings {
     static DEBUG_HITBOX = true;
 
     static readonly GAME_STEP_SIZE = 0.1;
+
+    static readonly RANDOM_SEED = "SUNFLOWER"
 }
 export default Settings

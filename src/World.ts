@@ -62,8 +62,6 @@ class World {
             onGameLoaded(this);
         });
 
-        let lag = 0;
-        let pools = Object.values(Factory.Pools);
         this.app.ticker.maxFPS = 60;
         this.app.ticker.minFPS = 30;
         // Time between physics update
@@ -71,21 +69,19 @@ class World {
         this.manager = new EventManager();               
         
         let gameTime = 0;
-        this.app.ticker.add(() => {
+        this.app.ticker.add((delta) => {
             gameTime += this.app.ticker.elapsedMS;
             this.manager.execute(gameTime);
-            lag += this.app.ticker.deltaTime;
-            while (lag >= Settings.GAME_STEP_SIZE) {
-                Factory.Pools[Bullet.name].forEach(bullet => {
-                    if (bullet.visible) bullet.update(Settings.GAME_STEP_SIZE, this.app.ticker.elapsedMS)
-                })
-                this.liveEnemies.forEach(enemy => {
-                    enemy.update(Settings.GAME_STEP_SIZE, this.app.ticker.elapsedMS);
-                })
-                this.player.update(Settings.GAME_STEP_SIZE, this.app.ticker.elapsedMS);
-                lag -= Settings.GAME_STEP_SIZE;
-                this.gameStep += 1;
-            }
+            const deltaSeconds = this.app.ticker.elapsedMS / 1000;
+            //gameTime += deltaSeconds;
+            Factory.Pools[Bullet.name].forEach(bullet => {
+                if (bullet.visible) bullet.update(deltaSeconds, this.app.ticker.elapsedMS)
+            })
+            this.liveEnemies.forEach(enemy => {
+                enemy.update(deltaSeconds, this.app.ticker.elapsedMS);
+            })
+            this.player.update(deltaSeconds, this.app.ticker.elapsedMS);
+            //this.gameStep += 1;
             document.getElementById("fps")!.innerHTML = Math.floor(this.app.ticker.FPS).toString();
         })
     }

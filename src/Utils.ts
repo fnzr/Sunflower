@@ -9,8 +9,8 @@ export function sleep(ms: number) {
 
 export function angleStep(arcCount: number, linearSpeed: number, start: number, end = Settings.WORLD_WIDTH) {
     const distance = end - start;
-    const gameSteps = distance / linearSpeed / Settings.GAME_STEP_SIZE;
-    return (Math.PI * arcCount) / gameSteps;
+    const seconds = distance / linearSpeed;
+    return (Math.PI * arcCount) / seconds;
 }
 
 export function randomInt(min: number, max: number) {

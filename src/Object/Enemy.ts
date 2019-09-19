@@ -8,7 +8,7 @@ export type EnemyProperties = Properties & {attackCooldown?: number}
 
 export default class Enemy extends Unit {
 
-    attackCooldown = 20000;
+    attackCooldown = 2000;
     lastAttack = 0;
 
     constructor() {
@@ -63,6 +63,6 @@ export default class Enemy extends Unit {
             return;
         }
         super.update(delta, elapsed);
-        this.lastAttack += elapsed;        
+        this.lastAttack += elapsed;
     }
 }
